@@ -1,21 +1,22 @@
 import json
-import datetime
 import pandas as pd
 import openpyxl
+from datetime import datetime, timedelta
 
 
 def read_json(file_path):
+    time_list = []
+    verb_list = []
+    code_list = []
+    work_list = []
+    prject_list = []
+    message_list = []
+    name_list = []
+    resource_list = []
+    subresource_list = []
+    username_list = []
+    ip_data_list = []
     with open(file_path, 'r', encoding='utf-8') as f:
-        time_list = []
-        verb_list = []
-        code_list = []
-        work_list = []
-        prject_list = []
-        message_list = []
-        resource_list = []
-        subresource_list = []
-        username_list = []
-        ip_data_list = []
         for line in f.readlines():
             json_data = json.loads(line)
             time_list.append(json_data['_source']['RequestReceivedTimestamp'])
@@ -24,12 +25,16 @@ def read_json(file_path):
             prject_list.append(json_data['_source']['ObjectRef']["Namespace"])
             message_list.append(json_data['_source']['Message'])
             resource_list.append(json_data['_source']['ObjectRef']["Resource"])
+            name_list.append(json_data['_source']['ObjectRef']["Name"])
             subresource_list.append(json_data['_source']['ObjectRef']["Subresource"])
             username_list.append(json_data['_source']["User"]["Username"])
             ip_data_list.append(json_data['_source']['SourceIPs'])
             code_list.append(json_data.get('_source', {}).get('ResponseStatus', ()).get('code', ''))
+            name_resource_list = [str(a) + " " + b for a, b in zip(resource_list, name_list)]
         for i in range(len(time_list)):
             time_list[i] = time_list[i][:19]
+            time_date = datetime.strptime(time_list[i], "%Y-%m-%dT%H:%M:%S")
+            end_time = time_date.strftime("%Y-%m-%d %H:%M:%S")
         for i in range(len(code_list)):
             if code_list[i] == 100:
                 code_list[i] = 'Continue'
@@ -113,13 +118,13 @@ def read_json(file_path):
                 code_list[i] = ''
 
         excel_dic = {}
-        excel_dic['时间'] = time_list
+        excel_dic['时间'] = end_time
         excel_dic["操作行为"] = verb_list
         excel_dic['状态码'] = code_list
         excel_dic["企业空间"] = work_list
         excel_dic["项目"] = prject_list
         excel_dic["原因"] = message_list
-        excel_dic["资源类型与名称"] = resource_list
+        excel_dic["资源类型与名称"] = name_resource_list
         excel_dic["子资源"] = subresource_list
         excel_dic["操作者"] = username_list
         excel_dic["源IP地址"] = ip_data_list
@@ -127,9 +132,9 @@ def read_json(file_path):
 
 
 def creat_excel(excel_path):
-    excel_time = f'{datetime.datetime.now().year}' + '-' + \
-                 f'{datetime.datetime.now().month}' + '-' + \
-                 f'{datetime.datetime.now().day}'
+    excel_time = f'{datetime.now().year}' + '-' + \
+                 f'{datetime.now().month}' + '-' + \
+                 f'{datetime.now().day}'
     excel_name = excel_path + f'/vxTEL_audit_{excel_time}.xlsx'
     wb = openpyxl.Workbook()
     wb.save(excel_name)

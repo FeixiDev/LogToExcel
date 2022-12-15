@@ -4,7 +4,7 @@ import action
 import re
 
 
-def fetch_flie(suffix, files_path='/root/elastic/backup', excel_path=sys.path[0]):
+def fetch_file(suffix, files_path='/root/elastic/backup', excel_path=sys.path[0]):
     file_name_list = []
     file_path_list = []
     sheet_name_list = []
@@ -13,8 +13,10 @@ def fetch_flie(suffix, files_path='/root/elastic/backup', excel_path=sys.path[0]
             if os.path.splitext(name)[1] == suffix and '.mapping' not in os.path.splitext(name)[0]:
                 file_name_list.append(name)
                 file_path_list.append(os.path.join(root, name))
+    file_path_list.sort()
+    file_name_list.sort()
     for i in range(len(file_name_list)):
-        sheet_name = re.findall('2.*?(?=.json)',(file_name_list[i]))
+        sheet_name = re.findall('2.*?(?=.json)', (file_name_list[i]))
         sheet_name_list.append(sheet_name)
     excel_dict_list = []
     for file_path in file_path_list:
@@ -25,4 +27,5 @@ def fetch_flie(suffix, files_path='/root/elastic/backup', excel_path=sys.path[0]
         action.to_excel(excel_dic=excel_dict_list[i],
                         excel_name=excel_name,
                         sheet_name=str(sheet_name_list[i][0]))
+
 
