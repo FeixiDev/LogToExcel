@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 def read_json(file_path):
     time_list = []
+    end_time_list = []
     verb_list = []
     code_list = []
     work_list = []
@@ -35,6 +36,7 @@ def read_json(file_path):
             time_list[i] = time_list[i][:19]
             time_date = datetime.strptime(time_list[i], "%Y-%m-%dT%H:%M:%S")
             end_time = time_date.strftime("%Y-%m-%d %H:%M:%S")
+            end_time_list.append(end_time)
         for i in range(len(code_list)):
             if code_list[i] == 100:
                 code_list[i] = 'Continue'
@@ -118,7 +120,7 @@ def read_json(file_path):
                 code_list[i] = ''
 
         excel_dic = {}
-        excel_dic['时间'] = end_time
+        excel_dic['时间'] = end_time_list
         excel_dic["操作行为"] = verb_list
         excel_dic['状态码'] = code_list
         excel_dic["企业空间"] = work_list
