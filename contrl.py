@@ -4,7 +4,7 @@ import action
 import re
 
 
-def fetch_file(suffix, files_path='/root/elastic/backup', excel_path='.'):
+def fetch_file(suffix, files_path=r'\root\elastic', excel_path='.'):
     file_name_list = []
     file_path_list = []
     sheet_name_list = []
